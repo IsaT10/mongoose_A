@@ -1,8 +1,17 @@
 import { TProduct } from './product.interface';
 import { Product } from './product.model';
 
-const getAllProductsFromDB = async () => {
-  const result = await Product.find();
+const getAllProductsFromDB = async (searchTerm: string | undefined) => {
+  const queryObject: any = {};
+
+  if (searchTerm) {
+    queryObject.$or = [
+      { name: { $regex: searchTerm, $options: 'i' } },
+      { description: { $regex: searchTerm, $options: 'i' } },
+    ];
+  }
+
+  const result = await Product.find(queryObject);
   return result;
 };
 
