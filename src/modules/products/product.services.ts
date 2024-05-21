@@ -20,11 +20,6 @@ const getSingleProductFromDB = async (id: string) => {
   return result;
 };
 
-const createProductIntoDB = async (payload: TProduct) => {
-  const result = await Product.create(payload);
-  return result;
-};
-
 const updateSingleProductIntoDB = async (id: string, updateData: object) => {
   const result = await Product.findByIdAndUpdate(id, updateData, {
     new: true,
@@ -34,6 +29,11 @@ const updateSingleProductIntoDB = async (id: string, updateData: object) => {
 };
 const deleteProductFromDB = async (id: string) => {
   const result = await Product.findByIdAndDelete(id);
+  return result;
+};
+
+const createProductIntoDB = async (payload: TProduct) => {
+  const result = await Product.create(payload);
   return result;
 };
 

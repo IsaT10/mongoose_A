@@ -45,25 +45,6 @@ const getSingleProduct = async (req: Request, res: Response) => {
   }
 };
 
-const createProduct = async (req: Request, res: Response) => {
-  try {
-    const productData = req.body;
-    const result = await ProductServices.createProductIntoDB(productData);
-
-    res.json({
-      success: true,
-      message: 'Product is created successfully !',
-      data: result,
-    });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Could not fetch product!',
-      error: err,
-    });
-  }
-};
-
 const updateProduct = async (req: Request, res: Response) => {
   const { productId } = req.params;
   const updateData = req.body;
@@ -83,6 +64,25 @@ const updateProduct = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: 'Product updated successfully!',
+      data: result,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Could not fetch product!',
+      error: err,
+    });
+  }
+};
+
+const createProduct = async (req: Request, res: Response) => {
+  try {
+    const productData = req.body;
+    const result = await ProductServices.createProductIntoDB(productData);
+
+    res.json({
+      success: true,
+      message: 'Product is created successfully !',
       data: result,
     });
   } catch (err: any) {
