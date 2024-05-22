@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { TOrder } from './order.interface';
+import { Product } from '../products/product.model';
 
 const orderSchema = new Schema<TOrder>({
   email: {
@@ -18,6 +19,18 @@ const orderSchema = new Schema<TOrder>({
     type: String,
     required: [true, 'Product ID is required'],
   },
+});
+
+orderSchema.pre('save', async function (next) {
+  const order = this as TOrder;
+
+  const product = await Product.findById(order.productId);
+  console.log(product);
+  if (!product) {
+    throw new Error('Product is not there');
+  }
+
+  next();
 });
 
 export const Order = model<TOrder>('Order', orderSchema);

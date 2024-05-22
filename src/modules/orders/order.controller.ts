@@ -57,9 +57,11 @@ const createOrder = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
+    console.log(err);
     res.status(500).json({
       success: false,
-      message: 'Could not fetch order!',
+      message: err.message || 'Something went wrong!',
+      messages: err.message,
       error: err,
     });
   }
