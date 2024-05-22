@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ProductServices } from './product.services';
+import { ProductValidationSchema } from './product.validation.schema';
 
 const getAllProducts = async (req: Request, res: Response) => {
   try {
@@ -78,7 +79,9 @@ const updateProduct = async (req: Request, res: Response) => {
 const createProduct = async (req: Request, res: Response) => {
   try {
     const productData = req.body;
-    const result = await ProductServices.createProductIntoDB(productData);
+
+    const validateData = ProductValidationSchema.parse(productData);
+    const result = await ProductServices.createProductIntoDB(validateData);
 
     res.json({
       success: true,
