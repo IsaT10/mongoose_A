@@ -9,14 +9,13 @@ const getAllProducts = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: 'Products are retrived successfully !',
+      message: 'Products fetched successfully!',
       data: result,
     });
   } catch (err: any) {
     res.status(500).json({
       success: false,
-      message: 'Could not fetch products!',
-      error: err,
+      message: err.message || 'Could not fetch products!',
     });
   }
 };
@@ -27,9 +26,7 @@ const getSingleProduct = async (req: Request, res: Response) => {
     const result = await ProductServices.getSingleProductFromDB(productId);
 
     if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Product not found' });
+      throw new Error('Product not found');
     }
 
     res.status(200).json({
@@ -40,8 +37,7 @@ const getSingleProduct = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({
       success: false,
-      message: 'Could not fetch product!',
-      error: err,
+      message: err.message || 'Could not fetch product!',
     });
   }
 };
@@ -57,9 +53,7 @@ const updateProduct = async (req: Request, res: Response) => {
     );
 
     if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Product not found' });
+      throw new Error('Product not found');
     }
 
     res.status(200).json({
@@ -70,8 +64,7 @@ const updateProduct = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({
       success: false,
-      message: 'Could not fetch product!',
-      error: err,
+      message: err.message || 'Could not fetch product!',
     });
   }
 };
@@ -85,15 +78,21 @@ const createProduct = async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: 'Product is created successfully !',
+      message: 'Product created successfully!',
       data: result,
     });
   } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Could not fetch product!',
-      error: err,
-    });
+    if (err.name === 'ZodError') {
+      res.status(500).json({
+        success: false,
+        message: err.issues[0].message,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
   }
 };
 
@@ -104,9 +103,7 @@ const deleteProduct = async (req: Request, res: Response) => {
     const result = await ProductServices.deleteProductFromDB(productId);
 
     if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Product not found' });
+      throw new Error('Product not found');
     }
 
     res.status(200).json({
@@ -117,8 +114,7 @@ const deleteProduct = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({
       success: false,
-      message: 'Could not delete product!',
-      error: err,
+      message: err.message || 'Could not delete product!',
     });
   }
 };

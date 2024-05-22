@@ -14,7 +14,7 @@ const InventoryValidationSchema = z.object({
 
 // Define the product schema
 const ProductValidationSchema = z.object({
-  name: z.string().min(1, { message: 'Product name is required' }),
+  name: z.string().trim().min(1, { message: 'Product name is required' }),
   description: z
     .string()
     .min(1, { message: 'Product description is required' }),
