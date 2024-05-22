@@ -22,16 +22,16 @@ const orderSchema = new Schema<TOrder>({
 });
 
 orderSchema.pre('save', async function (next) {
-  const order = this as TOrder;
+  const order = this;
 
   const product = await Product.findById(order.productId);
-  console.log(product);
+
   if (!product) {
-    throw new Error('Product is not there');
+    throw new Error('Product not found!');
   }
 
   if (order.quantity > product.inventory.quantity) {
-    throw new Error('Insufficient quantity available in inventory');
+    throw new Error('Insufficient quantity available in inventory!');
   }
 
   await Product.findByIdAndUpdate(

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { OrderServices } from './order.services';
+import { OrderValidationSchema } from './order.validation';
 
 const getAllOrders = async (req: Request, res: Response) => {
   try {
@@ -7,13 +8,9 @@ const getAllOrders = async (req: Request, res: Response) => {
 
     const result = await OrderServices.getAllOrdersFromDB(email);
 
-    // if (!result) {
-    //   throw new Error('Order not found');
-    // }
-
     res.status(200).json({
       success: true,
-      message: 'Orders are retrived successfully !',
+      message: 'Orders fetched successfully for user email!',
       data: result,
     });
   } catch (err: any) {
@@ -27,18 +24,27 @@ const getAllOrders = async (req: Request, res: Response) => {
 const createOrder = async (req: Request, res: Response) => {
   try {
     const orderData = req.body;
-    const result = await OrderServices.createNewOrderIntoDB(orderData);
+
+    const validateData = OrderValidationSchema.parse(orderData);
+    const result = await OrderServices.createNewOrderIntoDB(validateData);
 
     res.json({
       success: true,
-      message: 'Order is created successfully !',
+      message: 'Order created successfully!',
       data: result,
     });
   } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Something went wrong!',
-    });
+    if (err.name === 'ZodError') {
+      res.status(500).json({
+        success: false,
+        message: err.issues[0].message,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
   }
 };
 

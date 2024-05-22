@@ -7,6 +7,8 @@ const app: Application = express();
 app.use(express.json());
 app.use(cors());
 
+// api routes
+
 app.use('/api/products', ProductRoutes);
 app.use('/api/orders', OrderRoutes);
 
@@ -15,12 +17,10 @@ app.get('/', (req: Request, res: Response) => {
   res.status(200).json({ message: 'Server is running' });
 });
 
-// api routes
-
 app.all('*', (req, res) => {
   res.status(404).json({
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server`,
+    success: false,
+    message: `Route not found`,
   });
 });
 
