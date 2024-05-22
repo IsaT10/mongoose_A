@@ -12,11 +12,6 @@ const getAllOrdersFromDB = async (email: string | undefined) => {
   return result;
 };
 
-// const getSingleOrderFromDB = async (email: string | undefined) => {
-//   const result = await Order.find({ email });
-//   return result;
-// };
-
 const createNewOrderIntoDB = async (payload: TOrder) => {
   const result = await Order.create(payload);
   return result;

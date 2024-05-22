@@ -30,6 +30,23 @@ orderSchema.pre('save', async function (next) {
     throw new Error('Product is not there');
   }
 
+  if (order.quantity > product.inventory.quantity) {
+    throw new Error('Insufficient quantity available in inventory');
+  }
+
+  await Product.findByIdAndUpdate(
+    order.productId,
+    {
+      inventory: {
+        quantity: product.inventory.quantity - order.quantity,
+        inStock: product.inventory.quantity - order.quantity > 0,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
   next();
 });
 
