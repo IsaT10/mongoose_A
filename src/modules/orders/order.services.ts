@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { TOrder } from './order.interface';
 import { Order } from './order.model';
 

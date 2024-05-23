@@ -25,6 +25,7 @@ const ProductValidationSchema = zod_1.z.object({
         .string({
         required_error: 'Product name is required',
     })
+        .trim()
         .min(1, 'Product name cannot be empty'),
     description: zod_1.z
         .string({

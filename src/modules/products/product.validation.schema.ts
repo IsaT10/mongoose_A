@@ -26,15 +26,8 @@ const ProductValidationSchema = z.object({
     .string({
       required_error: 'Product name is required',
     })
-    .min(1, 'Product name cannot be empty')
-    .superRefine((val, ctx) => {
-      if (val.length !== new Set(val).size) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `No duplicates allowed.`,
-        });
-      }
-    }),
+    .trim()
+    .min(1, 'Product name cannot be empty'),
 
   description: z
     .string({

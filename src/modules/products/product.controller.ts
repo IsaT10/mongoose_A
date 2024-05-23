@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextFunction, Request, Response } from 'express';
 import { ProductServices } from './product.services';
 import { ProductValidationSchema } from './product.validation.schema';
@@ -7,20 +9,24 @@ const getAllProducts = async (
   res: Response,
   next: NextFunction
 ) => {
+  const searchTerm = req.query.searchTerm as string | undefined;
   try {
-    const searchTerm = req.query.searchTerm as string | undefined;
     const result = await ProductServices.getAllProductsFromDB(searchTerm);
 
     res.status(200).json({
       success: true,
-      message: 'Products fetched successfully!',
+      message: `${
+        searchTerm?.length
+          ? `Products matching search term '${searchTerm}' fetched successfully!`
+          : 'Products fetched successfully!'
+      }`,
       data: result,
     });
   } catch (err: any) {
     next({
       ...err,
       message:
-        err.message || 'Failed to retrieve products. Please try again later.',
+        err.message || 'Failed to retrieve products. Please try again later!',
     });
   }
 };

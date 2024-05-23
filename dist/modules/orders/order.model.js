@@ -29,13 +29,13 @@ const orderSchema = new mongoose_1.Schema({
         type: String,
         required: [true, 'Product ID is required'],
     },
-});
+}, { versionKey: false });
 orderSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const order = this;
         const product = yield product_model_1.Product.findById(order.productId);
         if (!product) {
-            throw new Error('Product not found!');
+            throw new Error('Product not found. Please ensure the product ID is correct and try again!');
         }
         if (order.quantity > product.inventory.quantity) {
             throw new Error('Insufficient quantity available in inventory!');

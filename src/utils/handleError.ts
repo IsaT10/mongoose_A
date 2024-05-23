@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 
 export const handleError = (res: Response, err: any) => {
-  let statusCode = err.statusCode || 500;
+  const statusCode = err.statusCode || 500;
   let message = err.message || 'Something went wrong!';
 
   if (err?.code === 11000) {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextFunction, Request, Response } from 'express';
 import { OrderServices } from './order.services';
 import { OrderValidationSchema } from './order.validation';
@@ -12,6 +14,12 @@ const getAllOrders = async (
 
     const result = await OrderServices.getAllOrdersFromDB(email);
 
+    console.log(result);
+
+    if (!result.length && email?.length) {
+      throw new Error('User has not placed an order!');
+    }
+
     res.status(200).json({
       success: true,
       message: `${
@@ -24,8 +32,8 @@ const getAllOrders = async (
   } catch (err: any) {
     next({
       ...err,
-      statusCode: 500,
-      message: err.message || 'Product not found',
+      message:
+        err.message || 'Failed to retrieve orders. Please try again later!',
     });
   }
 };
@@ -45,8 +53,9 @@ const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   } catch (err: any) {
     next({
       ...err,
-      statusCode: 404,
-      message: err.message || 'Order do not create successfully!',
+      message:
+        err.message ||
+        'An unexpected error occurred while creating the order.!',
     });
   }
 };

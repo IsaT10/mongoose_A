@@ -25,12 +25,14 @@ const orderSchema = new Schema<TOrder>(
 );
 
 orderSchema.pre('save', async function (next) {
-  const order = this;
+  const order = this as TOrder;
 
   const product = await Product.findById(order.productId);
 
   if (!product) {
-    throw new Error('Product not found!');
+    throw new Error(
+      'Product not found. Please ensure the product ID is correct and try again!'
+    );
   }
 
   if (order.quantity > product.inventory.quantity) {

@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,24 +13,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderControllers = void 0;
 const order_services_1 = require("./order.services");
 const order_validation_1 = require("./order.validation");
-const getAllOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllOrders = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const email = req.query.email;
         const result = yield order_services_1.OrderServices.getAllOrdersFromDB(email);
+        console.log(result);
+        if (!result.length && (email === null || email === void 0 ? void 0 : email.length)) {
+            throw new Error('User has not placed an order!');
+        }
         res.status(200).json({
             success: true,
-            message: 'Orders fetched successfully for user email!',
+            message: `${email
+                ? 'Orders fetched successfully for user email!'
+                : 'Orders fetched successfully!'}`,
             data: result,
         });
     }
     catch (err) {
-        res.status(500).json({
-            success: false,
-            message: 'Could not fetch orders!',
-        });
+        next(Object.assign(Object.assign({}, err), { message: err.message || 'Failed to retrieve orders. Please try again later!' }));
     }
 });
-const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const orderData = req.body;
         const validateData = order_validation_1.OrderValidationSchema.parse(orderData);
@@ -41,18 +45,8 @@ const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
     catch (err) {
-        if (err.name === 'ZodError') {
-            res.status(500).json({
-                success: false,
-                message: err.issues[0].message,
-            });
-        }
-        else {
-            res.status(500).json({
-                success: false,
-                message: err.message,
-            });
-        }
+        next(Object.assign(Object.assign({}, err), { message: err.message ||
+                'An unexpected error occurred while creating the order.!' }));
     }
 });
 exports.OrderControllers = {

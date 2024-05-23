@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { TProduct } from './product.interface';
 import { Product } from './product.model';
 
