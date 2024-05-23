@@ -1,8 +1,12 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { OrderServices } from './order.services';
 import { OrderValidationSchema } from './order.validation';
 
-const getAllOrders = async (req: Request, res: Response) => {
+const getAllOrders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const email = req.query.email as string | undefined;
 
@@ -10,18 +14,23 @@ const getAllOrders = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: 'Orders fetched successfully for user email!',
+      message: `${
+        email
+          ? 'Orders fetched successfully for user email!'
+          : 'Orders fetched successfully!'
+      }`,
       data: result,
     });
   } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Could not fetch orders!',
+    next({
+      ...err,
+      statusCode: 500,
+      message: err.message || 'Product not found',
     });
   }
 };
 
-const createOrder = async (req: Request, res: Response) => {
+const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orderData = req.body;
 
@@ -34,17 +43,11 @@ const createOrder = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    if (err.name === 'ZodError') {
-      res.status(500).json({
-        success: false,
-        message: err.issues[0].message,
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        message: err.message,
-      });
-    }
+    next({
+      ...err,
+      statusCode: 404,
+      message: err.message || 'Order do not create successfully!',
+    });
   }
 };
 

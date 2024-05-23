@@ -1,8 +1,12 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ProductServices } from './product.services';
 import { ProductValidationSchema } from './product.validation.schema';
 
-const getAllProducts = async (req: Request, res: Response) => {
+const getAllProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const searchTerm = req.query.searchTerm as string | undefined;
     const result = await ProductServices.getAllProductsFromDB(searchTerm);
@@ -13,20 +17,27 @@ const getAllProducts = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Could not fetch products!',
+    next({
+      ...err,
+      message:
+        err.message || 'Failed to retrieve products. Please try again later.',
     });
   }
 };
 
-const getSingleProduct = async (req: Request, res: Response) => {
+const getSingleProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { productId } = req.params;
     const result = await ProductServices.getSingleProductFromDB(productId);
 
     if (!result) {
-      throw new Error('Product not found');
+      throw new Error(
+        'Product not found. Please ensure the product ID is correct and try again'
+      );
     }
 
     res.status(200).json({
@@ -35,14 +46,18 @@ const getSingleProduct = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Could not fetch product!',
+    next({
+      ...err,
+      message: err.message || 'Unable to fetch the requested product!',
     });
   }
 };
 
-const updateProduct = async (req: Request, res: Response) => {
+const updateProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { productId } = req.params;
   const updateData = req.body;
 
@@ -53,7 +68,9 @@ const updateProduct = async (req: Request, res: Response) => {
     );
 
     if (!result) {
-      throw new Error('Product not found');
+      throw new Error(
+        'Product not found. Please ensure the product ID is correct and try again'
+      );
     }
 
     res.status(200).json({
@@ -62,14 +79,18 @@ const updateProduct = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Could not fetch product!',
+    next({
+      ...err,
+      message: err.message || 'Failed to update the product!',
     });
   }
 };
 
-const createProduct = async (req: Request, res: Response) => {
+const createProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const productData = req.body;
 
@@ -82,28 +103,27 @@ const createProduct = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    if (err.name === 'ZodError') {
-      res.status(500).json({
-        success: false,
-        message: err.issues[0].message,
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        message: err.message,
-      });
-    }
+    next({
+      ...err,
+      message: err.message || 'Failed to create the product!',
+    });
   }
 };
 
-const deleteProduct = async (req: Request, res: Response) => {
+const deleteProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { productId } = req.params;
 
   try {
     const result = await ProductServices.deleteProductFromDB(productId);
 
     if (!result) {
-      throw new Error('Product not found');
+      throw new Error(
+        'Product not found. Please ensure the product ID is correct and try again'
+      );
     }
 
     res.status(200).json({
@@ -112,9 +132,9 @@ const deleteProduct = async (req: Request, res: Response) => {
       data: null,
     });
   } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Could not delete product!',
+    next({
+      ...err,
+      message: err.message || 'Failed to delete the product',
     });
   }
 };
